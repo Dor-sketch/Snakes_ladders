@@ -1,2 +1,11 @@
 *.DS_store
 
+./vscode
+
+*.o
+
+*.out
+
+*.json
+
+app
