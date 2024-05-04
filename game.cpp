@@ -10,9 +10,25 @@ GtkWidget *Game::roll_button;
 GtkWidget *Game::vbox;
 std::vector<std::vector<int>> Game::board;
 std::vector<int> Game::playerPos;
-
-
-
+#include <iomanip>
+void printBoardWithNums(std::vector<std::vector<int>> board) {
+    int n = board.size();
+    for (int i = 0; i < n; i++) {
+        if (i % 2 == 0) {
+            for (int j = 0; j < n; j++) {
+                int cellNum = n * (n - i - 1) + j + 1;
+                std::cout << std::setw(3) << cellNum << "=" << std::setw(3) << board[n - i - 1][j] << " ";
+            }
+        } else {
+            for (int j = n - 1; j >= 0; j--) {
+                int cellNum = n * (n - i - 1) + j + 1;
+                std::cout << std::setw(3) << cellNum << "=" << std::setw(3) << board[n - i - 1][j] << " ";
+            }
+        }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+}
 Game::Game() {
     // Initialize the player position
     playerPos.push_back(1);
@@ -74,35 +90,39 @@ std::vector<std::vector<int>> Game::generateBoard(int n) {
         used.insert(start);
         used.insert(end);
     }
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            std::cout << board[i][j] << " ";
-        }
-        std::cout << std::endl;
-    }
     return board;
 }
-
 void Game::movePlayer(int roll) {
     // Move the player
-    playerPos[0] += roll;
-    if (playerPos[0] > board.size() * board.size()) playerPos[0] = board.size() * board.size();
+    auto playerPos = getPos(Game::playerPos[0]);
+    auto nextPos = getPos(Game::playerPos[0] + 1);
+    std::cout << "Player position: " << Game::playerPos[0] << std::endl;
+    std::cout << "Player row: " << playerPos.first << " col: " << playerPos.second << std::endl;
+    std::cout << "Next row: " << nextPos.first << " col: " << nextPos.second << std::endl;
+
+    Game::playerPos[0] += 1;
+    if (board[nextPos.first][nextPos.second] != -1) {
+        std::cout << "Landed on a snake or ladder" << std::endl;
+        std::cout << "Next cell: " << board[nextPos.first][nextPos.second] << std::endl;
+        // If the player lands on a snake or a ladder, move to the new position
+        Game::playerPos[0] = board[nextPos.first][nextPos.second];
+    }
+    if (Game::playerPos[0] > board.size() * board[0].size()) {
+        // If the player's position exceeds the board size, set it to the last cell
+        Game::playerPos[0] = board.size() * board[0].size();
+    }
 
     // Redraw the drawing area
     gtk_widget_queue_draw(drawing_area);
-}gboolean Game::draw_cell(GtkWidget* widget, cairo_t* cr, gpointer data) {
+}
+gboolean Game::draw_cell(GtkWidget* widget, cairo_t* cr, gpointer data) {
     Game* game = static_cast<Game*>(data);
     std::pair<int, int> pos = game->getPos(game->playerPos[0]);
     int n = game->board.size();
     int cellSize = 600 / n;
     int cellPadding = cellSize / 10;
     int playerSize = cellSize / 2;
-    for (const auto &row : game->board) {
-        for (int cell : row) {
-            std::cout << cell << " ";
-        }
-        std::cout << std::endl;
-    }
+
     cairo_text_extents_t extents;
 
     // Draw the cells
@@ -134,26 +154,17 @@ void Game::movePlayer(int roll) {
             }
 
             // Draw snakes and ladders
-            std::pair<int, int> endPos = game->getPos(game->board[i][j]);
-            if (game->board[i][j] > n * i + j + 1 && endPos != std::make_pair(i, j)) { // Ladder
-                cairo_pattern_t* pat = cairo_pattern_create_linear(j * cellSize + cellSize / 2, i * cellSize + cellSize / 2, endPos.second * cellSize + cellSize / 2, endPos.first * cellSize + cellSize / 2);
-                cairo_pattern_add_color_stop_rgb(pat, 0, 0, 1, 0); // Green at the start
-                cairo_pattern_add_color_stop_rgb(pat, 1, 0, 0.5, 0); // Darker green at the end
-                cairo_set_source(cr, pat);
-                cairo_move_to(cr, j * cellSize + cellSize / 2, i * cellSize + cellSize / 2);
-                cairo_line_to(cr, endPos.second * cellSize + cellSize / 2, endPos.first * cellSize + cellSize / 2);
+            if (game->board[i][j] != -1) {
+                std::pair<int, int> nextPos = game->getPos(game->board[i][j]);
+                cairo_set_line_width(cr, cellPadding / 2);
+                if (game->board[i][j] > i * n + j + 1) cairo_set_source_rgb(cr, 0, 1, 0); // green
+                else cairo_set_source_rgb(cr, 0, 0, 1); // blue
+                cairo_move_to(cr, j * cellSize + cellPadding, i * cellSize + cellPadding);
+                cairo_line_to(cr, nextPos.second * cellSize + cellPadding, nextPos.first * cellSize + cellPadding);
                 cairo_stroke(cr);
-                cairo_pattern_destroy(pat);
-            } else if (game->board[i][j] < n * i + j + 1 && endPos != std::make_pair(i, j)) { // Snake
-                cairo_pattern_t* pat = cairo_pattern_create_linear(j * cellSize + cellSize / 2, i * cellSize + cellSize / 2, endPos.second * cellSize + cellSize / 2, endPos.first * cellSize + cellSize / 2);
-                cairo_pattern_add_color_stop_rgb(pat, 0, 1, 0, 0); // Red at the start
-                cairo_pattern_add_color_stop_rgb(pat, 1, 0.5, 0, 0); // Darker red at the end
-                cairo_set_source(cr, pat);
-                cairo_move_to(cr, j * cellSize + cellSize / 2, i * cellSize + cellSize / 2);
-                cairo_curve_to(cr, j * cellSize + cellSize / 2, endPos.first * cellSize, endPos.second * cellSize + cellSize / 2, endPos.first * cellSize, endPos.second * cellSize + cellSize / 2, endPos.first * cellSize + cellSize / 2);
-                cairo_stroke(cr);
-                cairo_pattern_destroy(pat);
             }
+
+
         }
     }
 
@@ -173,6 +184,7 @@ void Game::on_roll_button_clicked(GtkWidget *button, gpointer user_data) {
     std::uniform_int_distribution<int> dis(1, 6);
     int roll = dis(gen);
     movePlayer(roll);
+    printBoardWithNums(board);
 }
 
 std::pair<int, int> Game::getPos(int num) {
