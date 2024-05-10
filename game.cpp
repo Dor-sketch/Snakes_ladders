@@ -274,3 +274,6 @@ std::pair<int, int> Game::getPos(int num) {
     col = n - 1 - col;
   return std::make_pair(row, col);
 }
+
+
+

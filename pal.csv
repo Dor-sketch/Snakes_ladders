@@ -1,0 +1,25 @@
+// PAL = { a | a = a^R }
+q1,0,q6,_,R
+q1,1,q2,_,R
+q1,_,q_accept,_,R
+q6,0,q6,0,R
+q6,1,q6,1,R
+q6,_,q3,_,L
+q2,0,q2,0,R
+q2,1,q2,1,R
+q2,_,q4,_,L
+q3,0,q5,_,L
+q3,1,q_reject,1,R
+q3,_,q_accept,_,R
+q4,0,q_reject,0,R
+q4,1,q5,_,L
+q4,_,q_accept,_,R
+q5,0,q5,0,L
+q5,1,q5,1,L
+q5,_,q1,_,R
+q_reject,0,q_reject,0,R
+q_reject,1,q_reject,1,R
+q_reject,_,q_reject,_,R
+q_accept,0,q_accept,0,R
+q_accept,1,q_accept,1,R
+q_accept,_,q_accept,_,R
