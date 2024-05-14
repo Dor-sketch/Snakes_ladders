@@ -1,11 +1,8 @@
-*.DS_store
-
-./vscode
-
+.DS_Store
+vscode/
 *.o
-
 *.out
-
 *.json
-
+*.mov
 app
+music/build/*

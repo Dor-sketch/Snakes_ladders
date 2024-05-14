@@ -1,0 +1,18 @@
+cmake_minimum_required(VERSION 3.10)
+project(MusicParser)
+
+set(CMAKE_CXX_STANDARD 14)
+
+find_package(OpenCV REQUIRED)
+find_package(Qt5Core REQUIRED)
+
+# Find the OpenVINO library
+find_library(OpenVINO_LIBRARY NAMES openvino.2400 PATHS /usr/local/Cellar/openvino/2024.0.0/lib)
+
+include_directories(${OpenCV_INCLUDE_DIRS})
+include_directories(${Qt5Core_INCLUDE_DIRS})
+
+add_executable(MusicParser main.cpp music_parser.cpp)
+
+# Link the OpenVINO library
+target_link_libraries(MusicParser ${OpenCV_LIBS} Qt5::Core ${OpenVINO_LIBRARY})
