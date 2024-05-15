@@ -4,5 +4,9 @@ vscode/
 *.out
 *.json
 *.mov
+*.mp4
+*.mp3
+*.wav
+*.mid
 app
 music/build/*
