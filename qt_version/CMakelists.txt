@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.19)
+project(MyGame)
+
+set(CMAKE_CXX_STANDARD 17)
+
+# Set Qt6_DIR explicitly
+set(Qt6_DIR /usr/local/Cellar/qt/6.7.0_1/lib/cmake/Qt6)
+
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
+
+add_executable(MyGame
+    main.cpp
+    game.cpp
+    snakes.cpp
+)
+
+find_package(Qt6 COMPONENTS Core Gui Widgets REQUIRED)
+target_link_libraries(MyGame Qt6::Core Qt6::Gui Qt6::Widgets)
