@@ -1,4 +1,9 @@
-# Snakes and Ladders Game
+<p align="center">
+    <img src="/images/qt_cover.png" width="800" />
+    <br>
+    <h1 align="center">Snakes and Ladders Game</h1>
+    <p align="center">Enhanced with Qt6, WebAssembly-ready, and simplified CMake builds</p>
+</p>
 
 This project is an implementation of the classic Snakes and Ladders game with a twist - it incorporates musical notes that are played as the players move across the board. The game uses GTK for the GUI and optionally supports MIDI files to generate the notes.
 

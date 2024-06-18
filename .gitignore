@@ -10,3 +10,4 @@ vscode/
 *.mid
 app
 music/build/*
+qt_version/build/*
